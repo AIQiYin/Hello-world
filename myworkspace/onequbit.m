@@ -1,0 +1,75 @@
+
+%符号t2rho矩阵
+syms t1 t2 t3 t4 t5 t6 t7 real
+t=[t1 t2 t3 t4];
+rho=diag(t(1:2));
+rho(3)=t(3)+t(4)*1i;
+rho=simplify(rho'*rho);
+rho=[          t1^2,    t1*(t3 + 1i*t4)
+     t1*(t3 - 1i*t4), t2^2 + t3^2 + t4^2];
+ 
+%符号p2rho矩阵
+sigma0=[1,0;0,1];sigma1=[0,1;1,0];sigma2=[0,-1i;1i,0];sigma3=[1,0;0,-1];
+% base={sigma0,sigma1,sigma2,sigma3};
+% syms p0 p1 p2 p3 real
+% p=[p0 p1 p2 p3];
+% rhop=p(1)*base{1};
+% for i=2:4
+%       rhop=rhop+p(i)*base{i};
+% end
+% rhop=simplify(rhop/2);
+% rhop=[    p0/2 + p3/2, p1/2 - (1i*p2)/2
+%       p1/2 + (1i*p2)/2,     p0/2 - p3/2];  
+% x=rhop;
+
+  % 模拟产生rho数据
+  %r=sqrt(rand);
+  r=1;
+  theta=rand*2*pi;
+  phi=rand*pi;
+  p1=r*sin(phi)*cos(theta);
+  p2=r*sin(phi)*sin(theta);
+  p3=r*cos(phi);
+  rhoreal=1/2*[1+p3,p1-1i*p2;p1+1i*p2,1-p3];
+  Psi=[1 0 1/sqrt(2) 1/sqrt(2) 1/sqrt(2) 1/sqrt(2)
+      0 1 -1i/sqrt(2) 1/sqrt(2) 1i/sqrt(2) -1/sqrt(2)];
+  N=20;                      %N次测量
+  n=simu_data(rhoreal,Psi,N); 
+  r1=(n(4)-n(6))/(n(4)+n(6));r2=-(n(3)-n(5))/(n(3)+n(5));r3=(n(1)-n(2))/(n(1)+n(2));
+  x=1/2*(sigma0+r1*sigma1+r2*sigma2+r3*sigma3);eig(x)
+  
+%拉格朗日乘子求极值
+% f=simplify(rho(1)+rho(4)+t5*(rho(2)+rho(2)'-(x(2)+x(2)'))+t6*(rho(2)-rho(2)'-(x(2)-x(2)'))/1i+t7*(rho(1)-rho(4)-(x(1)-x(4))));
+% eq1=diff(f,t1);eq2=diff(f,t2);eq3=diff(f,t3);eq4=diff(f,t4);eq5=diff(f,t5);eq6=diff(f,t6);eq7=diff(f,t7);
+% s=solve(eq1,eq2,eq3,eq4,eq5,eq6,eq7,t1,t2,t3,t4,t5,t6,t7);
+
+%球对称rho(t)=rho(-t)，取T=|t|，得极值根
+% T1=sqrt(r3/2 + (r1^2 + r2^2 + r3^2)^(1/2)/2);
+% T2=0;T3=r1/T1/2;T4=-r2/T1/2;T=[T1 T2 T3 T4];
+% T=T/norm(T);t1=T(1);t2=T(2);t3=T(3);t4=T(4);                              %Result is not good.T is not min
+% rhomeas=subs(rho);fidelity=fidelityfunc(rhomeas,rhoreal)
+
+%二分法求极小值
+if min(eig(x))<0
+     step1=0;step2=4;
+     y=x;
+     while min(eig(y))>1e-10||min(eig(y))<0
+           step=(step1+step2)/2;y=x+step*eye(2);
+           if min(eig(y))>0
+               step2=step;
+           else step1=step;
+           end 
+     end
+     x=y;
+end
+rhomeas=x/trace(x);fidelity=fidelityfunc(rhomeas,rhoreal)
+
+
+
+%solve for Langelari
+% syms t1 t2 t3 t4 p1 p2 p3 real
+% eq1=2*t1+t2*p1-t3*p2+2*t4*t1;eq2=p1+2*t2*t1-t4*p1;
+% eq3=-p2+2*t3*t1+t4*p2;eq4=4*t1^2-p1^2-p2^2-4*p3*t1;
+% s=solve(eq1,eq2,eq3,eq4,t1,t2,t3,t4);
+% t1=[ p3/2 - (p1^2 + p2^2 + p3^2)^(1/2)/2
+%      p3/2 + (p1^2 + p2^2 + p3^2)^(1/2)/2];

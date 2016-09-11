@@ -1,0 +1,7 @@
+function rho=MLErho(n)
+ P=P/trace(P);
+ t=rho2t(P);
+ global f;
+ options = optimset('MaxFunEvals',8000);
+[t,~,f]=fminunc(@Mlike,t,options,n,N);
+rho=t2rho(t);

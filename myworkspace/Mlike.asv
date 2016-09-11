@@ -1,0 +1,8 @@
+function l=Mlike(t,n,base)
+rho=t2rho(t);
+l=0;
+for m=1:n
+    A=a{m};
+    l=l+real(log(1+(A(1)*2*r(2)*r(3)+A(2)*2*r(2)*r(4)+A(3)*(r(1)^2+r(3)^2+r(4)^2-r(2)^2))/rsquare));
+end
+likelihood=-l;

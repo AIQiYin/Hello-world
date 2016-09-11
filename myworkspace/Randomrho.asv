@@ -1,0 +1,5 @@
+n=2;
+H = 2*(randn(n) + 1i*randn(n)) - (1+1i);
+H = H + H';
+p = 10*H;
+p = p*p'/trace(p*p');

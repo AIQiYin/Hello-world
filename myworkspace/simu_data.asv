@@ -1,0 +1,8 @@
+function n=simu_data(rho,Psi,N)
+n=zeros(1,6);                     %12 , 35 , 46
+prob1=Psi(:,1)'*rho*Psi(:); 
+for i=1:N
+    if prob>=rand
+        n=n+1;
+    end
+end
